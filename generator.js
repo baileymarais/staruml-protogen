@@ -11,6 +11,7 @@ define(function (require, exports, module) {
     var protoPackage = (packageName ? packageName : "autogen.models");
     generator.writeLine('syntax = "proto3";');
     generator.writeLine('package ' + protoPackage + ';');
+    generator.writeLine();
   }
 
   function _fieldName(field) {

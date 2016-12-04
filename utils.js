@@ -4,7 +4,7 @@ define(function (require, exports, module) {
     function Generator(indentString) {
       this.lines = [];
       this.indentations = [];
-      this.indentString = (indentString ? indentString : '\t'); // default tab
+      this.indentString = (indentString ? indentString : '    '); // default 4 spaces
     }
 
     Generator.prototype.indent = function() {
