@@ -14,6 +14,18 @@ define(function (require, exports, module) {
     generator.writeLine();
   }
 
+  // TODO(sathyp): Offer the ability to modify MAX_LINE_LENGTH to users.
+  function _writeComment(generator, comment) {
+    var COMMENT_PREFIX = '// ',
+        MAX_LINE_LENGTH = 80 - COMMENT_PREFIX.length; // Default line limit of 80 chars.
+
+    var commentLines = Utils.splitter(comment, MAX_LINE_LENGTH);
+
+    commentLines.forEach(function (c) {
+      generator.writeLine(COMMENT_PREFIX + c);
+    });
+  }
+
   function _fieldName(field) {
     var fieldName = Utils.replaceAll(field.name, ' ', '_');
     return fieldName;
@@ -47,7 +59,10 @@ define(function (require, exports, module) {
       INET: undefined
     };
 
-    if (typeof map[field.type] !== 'undefined') {
+    // Handle foreign keys first.
+    if (field.referenceTo) {
+      return field.referenceTo._parent.name;
+    } else if (typeof map[field.type] !== 'undefined') {
       return map[field.type];
     } else {
       return undefined;
@@ -57,14 +72,20 @@ define(function (require, exports, module) {
   function writeProtobuf(service, model, packageName, basePath) {
     var generator = new Utils.Generator();
 
+    // Generate the syntax and package block.
     _initializeProtobuf(generator, packageName);
+
+    // Write the message definition / body.
+    if (model.documentation) { _writeComment(generator, model.documentation); }
     generator.writeLine('message ' + model.name + ' {');
     generator.indent();
     model.columns.forEach(function (field, index) {
       var fieldName = _fieldName(field),
           dataType  = _dataType(field);
 
+      if (field.documentation) { _writeComment(generator, field.documentation); }
       generator.writeLine(dataType + ' ' + field.name + ' = ' + index + ';');
+      generator.writeLine();
     });
     generator.outdent();
     generator.writeLine('}');
