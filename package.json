@@ -1,0 +1,18 @@
+{
+    "name": "tools.protogen",
+    "title": "Protobuf Generator",
+    "description": "Protocol buffer generator from ERD.",
+    "homepage": "https://github.com/PranavSathy/staruml-protogen",
+    "issues": "https://github.com/PranavSathy/staruml-protogen/issues",
+    "keywords": ["ddl", "erd", "proto", "protobuf", "grpc", "google"],
+    "version": "0.1.0",
+    "author": {
+        "name": "Pranav Sathyanarayanan",
+        "email": "pranav.sathy@gmail.com",
+        "url": "https://github.com/PranavSathy"
+    },
+    "license": "MIT",
+    "engines": {
+        "staruml": ">=2.0.0"
+    }
+}
