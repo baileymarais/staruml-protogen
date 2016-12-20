@@ -75,7 +75,35 @@ define(function (require, exports, module) {
         return strs;
     };
 
+    function toSnakeCase(str) {
+      return str.replace(/\.?([A-Z]+)/g, function (x, y) {
+        return "_" + y.toLowerCase()
+      }).replace(/^_/, "");
+    }
+
+    function tag(name, elem) {
+      if (!elem || typeof(elem.tags) === 'undefined') {
+        return null;
+      }
+      var len = elem.tags.length;
+      for (var i = 0; i < len; i++) {
+        var tag = elem.tags[i];
+        var tagName = tag.name;
+        if (typeof tagName == 'undefined') {
+          tagName = '';
+        } else {
+          tagName = tagName.toLowerCase();
+        }
+        if (name.toLowerCase() == tagName) {
+          return tag;
+        }
+      }
+      return null;
+    }
+
     exports.Generator = Generator;
     exports.replaceAll = replaceAll;
     exports.splitter = splitter;
+    exports.toSnakeCase = toSnakeCase;
+    exports.tag = tag;
 });

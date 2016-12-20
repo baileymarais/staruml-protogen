@@ -92,11 +92,27 @@ define(function (require, exports, module) {
     }
   }
 
-  function writeProtobuf(service, model, packageName, basePath) {
+  function writeProtobuf(service, model, packageName, basePath, protoPath) {
     var generator = new Utils.Generator();
 
     // Generate the syntax and package block.
     _initializeProtobuf(generator, packageName);
+
+    // Determine local imports (within the same package).
+    // TODO(sathyp): Write a custom tag which can import foreign message types.
+    model.columns.forEach(function (field, index) {
+      if (field.referenceTo) {
+        if (!index) generator.writeLine();
+
+        var foreignMsg = Utils.toSnakeCase(field.referenceTo._parent.name),
+            importPath = foreignMsg + ".proto";
+
+        if (protoPath) importPath = protoPath.value + '/' + importPath;
+        generator.writeLine('import "' + importPath + '";');
+
+        if (index == model.columns.length - 1) generator.writeLine();
+      }
+    });
 
     // Write the message definition / body.
     if (model.documentation) { _writeComment(generator, model.documentation); }
@@ -104,17 +120,19 @@ define(function (require, exports, module) {
     generator.indent();
     model.columns.forEach(function (field, index) {
       var fieldName = _fieldName(field),
-          dataType  = _dataType(field);
+          dataType  = _dataType(field),
+          tagNum = index + 1;
 
+      if (index) generator.writeLine();
       if (field.documentation) { _writeComment(generator, field.documentation); }
-      generator.writeLine(dataType + ' ' + field.name + ' = ' + index + ';');
-      generator.writeLine();
+      generator.writeLine(dataType + ' ' + field.name + ' = ' + tagNum + ';');
     });
     generator.outdent();
     generator.writeLine('}');
 
     // Save the generated file to the file system.
-    var file = FileSystem.getFileForPath(basePath + '/' + model.name + '.proto');
+    var fileName = Utils.toSnakeCase(model.name)
+    var file = FileSystem.getFileForPath(basePath + '/' + fileName + '.proto');
     FileUtils.writeText(file, generator.getData(), true);
 
     Toast.info('Succesfully generated protobuf for ' + model.name);
@@ -127,9 +145,11 @@ define(function (require, exports, module) {
       if (e instanceof type.ERDDataModel) {
         var packageName = e.name + '.models';
 
+        var protoPath = Utils.tag('proto_path', e);
+
         e.ownedElements.forEach(function (model) {
           if (model instanceof type.ERDEntity) {
-            writeProtobuf(e, model, packageName, basePath);
+            writeProtobuf(e, model, packageName, basePath, protoPath);
           }
         });
       }
