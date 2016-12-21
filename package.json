@@ -5,7 +5,7 @@
     "homepage": "https://github.com/PranavSathy/staruml-protogen",
     "issues": "https://github.com/PranavSathy/staruml-protogen/issues",
     "keywords": ["ddl", "erd", "proto", "protobuf", "grpc", "google"],
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": {
         "name": "Pranav Sathyanarayanan",
         "email": "pranav.sathy@gmail.com",
