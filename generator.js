@@ -125,7 +125,7 @@ define(function (require, exports, module) {
 
       if (index) generator.writeLine();
       if (field.documentation) { _writeComment(generator, field.documentation); }
-      generator.writeLine(dataType + ' ' + field.name + ' = ' + tagNum + ';');
+      generator.writeLine((field.nullable?'optional ':'required ') + dataType + ' ' + field.name + ' = ' + tagNum + ';');
     });
     generator.outdent();
     generator.writeLine('}');
